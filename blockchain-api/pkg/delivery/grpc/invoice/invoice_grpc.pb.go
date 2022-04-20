@@ -22,7 +22,8 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type InvoiceServiceClient interface {
-	GetInvoice(ctx context.Context, in *InvoiceInput, opts ...grpc.CallOption) (*InvoiceOutput, error)
+	GetInvoice(ctx context.Context, in *GetInvoiceInput, opts ...grpc.CallOption) (*InvoiceOutput, error)
+	CreateInvoice(ctx context.Context, in *CreateInvoiceInput, opts ...grpc.CallOption) (*InvoiceOutput, error)
 }
 
 type invoiceServiceClient struct {
@@ -33,9 +34,18 @@ func NewInvoiceServiceClient(cc grpc.ClientConnInterface) InvoiceServiceClient {
 	return &invoiceServiceClient{cc}
 }
 
-func (c *invoiceServiceClient) GetInvoice(ctx context.Context, in *InvoiceInput, opts ...grpc.CallOption) (*InvoiceOutput, error) {
+func (c *invoiceServiceClient) GetInvoice(ctx context.Context, in *GetInvoiceInput, opts ...grpc.CallOption) (*InvoiceOutput, error) {
 	out := new(InvoiceOutput)
 	err := c.cc.Invoke(ctx, "/proto.InvoiceService/GetInvoice", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *invoiceServiceClient) CreateInvoice(ctx context.Context, in *CreateInvoiceInput, opts ...grpc.CallOption) (*InvoiceOutput, error) {
+	out := new(InvoiceOutput)
+	err := c.cc.Invoke(ctx, "/proto.InvoiceService/CreateInvoice", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +56,8 @@ func (c *invoiceServiceClient) GetInvoice(ctx context.Context, in *InvoiceInput,
 // All implementations must embed UnimplementedInvoiceServiceServer
 // for forward compatibility
 type InvoiceServiceServer interface {
-	GetInvoice(context.Context, *InvoiceInput) (*InvoiceOutput, error)
+	GetInvoice(context.Context, *GetInvoiceInput) (*InvoiceOutput, error)
+	CreateInvoice(context.Context, *CreateInvoiceInput) (*InvoiceOutput, error)
 	mustEmbedUnimplementedInvoiceServiceServer()
 }
 
@@ -54,8 +65,11 @@ type InvoiceServiceServer interface {
 type UnimplementedInvoiceServiceServer struct {
 }
 
-func (UnimplementedInvoiceServiceServer) GetInvoice(context.Context, *InvoiceInput) (*InvoiceOutput, error) {
+func (UnimplementedInvoiceServiceServer) GetInvoice(context.Context, *GetInvoiceInput) (*InvoiceOutput, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetInvoice not implemented")
+}
+func (UnimplementedInvoiceServiceServer) CreateInvoice(context.Context, *CreateInvoiceInput) (*InvoiceOutput, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateInvoice not implemented")
 }
 func (UnimplementedInvoiceServiceServer) mustEmbedUnimplementedInvoiceServiceServer() {}
 
@@ -71,7 +85,7 @@ func RegisterInvoiceServiceServer(s grpc.ServiceRegistrar, srv InvoiceServiceSer
 }
 
 func _InvoiceService_GetInvoice_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(InvoiceInput)
+	in := new(GetInvoiceInput)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -83,7 +97,25 @@ func _InvoiceService_GetInvoice_Handler(srv interface{}, ctx context.Context, de
 		FullMethod: "/proto.InvoiceService/GetInvoice",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(InvoiceServiceServer).GetInvoice(ctx, req.(*InvoiceInput))
+		return srv.(InvoiceServiceServer).GetInvoice(ctx, req.(*GetInvoiceInput))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _InvoiceService_CreateInvoice_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateInvoiceInput)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(InvoiceServiceServer).CreateInvoice(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.InvoiceService/CreateInvoice",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(InvoiceServiceServer).CreateInvoice(ctx, req.(*CreateInvoiceInput))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -98,6 +130,10 @@ var InvoiceService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetInvoice",
 			Handler:    _InvoiceService_GetInvoice_Handler,
+		},
+		{
+			MethodName: "CreateInvoice",
+			Handler:    _InvoiceService_CreateInvoice_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

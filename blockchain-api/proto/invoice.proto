@@ -10,11 +10,19 @@ message InvoiceOutput {
   string status = 3;
 }
 
-message InvoiceInput {
+message GetInvoiceInput {
   string invoiceId = 1;
 }
 
+message CreateInvoiceInput {
+  string amount = 1;
+  string currency = 2;
+}
+
 service InvoiceService {
-  rpc GetInvoice (InvoiceInput) returns (InvoiceOutput) {
+  rpc GetInvoice (GetInvoiceInput) returns (InvoiceOutput) {
+  }
+
+  rpc CreateInvoice (CreateInvoiceInput) returns (InvoiceOutput) {
   }
 }
