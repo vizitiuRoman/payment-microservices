@@ -5,6 +5,8 @@ type Input struct {
 }
 
 type Output struct {
+	ID       string
+	WalletID string
 	Currency string
 	Amount   string
 }

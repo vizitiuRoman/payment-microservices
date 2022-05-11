@@ -8,7 +8,6 @@ import (
 	"os/signal"
 
 	"github.com/jmoiron/sqlx"
-	_ "github.com/lib/pq"
 	"github.com/vizitiuRoman/blockchain-api/pkg/delivery/grpc/invoice"
 	"github.com/vizitiuRoman/blockchain-api/pkg/repositories"
 	"github.com/vizitiuRoman/blockchain-api/pkg/repositories/postgres"
@@ -17,17 +16,24 @@ import (
 )
 
 func main() {
-	db, err := postgres.NewPostgresDB(&postgres.Config{})
+	db, err := postgres.NewPostgresDB(&postgres.Config{
+		DBName:   "db",
+		Username: "db",
+		Password: "db",
+		Host:     "db",
+		Port:     "5432",
+		SSLMode:  "disable",
+	})
 	if err != nil {
-		log.Fatalf("fail when coonect to database")
+		log.Fatalf("fail when connect to database")
 	}
 
 	signalChan := make(chan os.Signal, 1)
 	signal.Notify(signalChan, os.Interrupt)
 
 	grpcServer := grpc.NewServer()
-	listener, err := net.Listen("tcp", "50001")
-	if err := db.Close(); err != nil {
+	listener, err := net.Listen("tcp", ":50001")
+	if err != nil {
 		log.Fatalf("fail when listen to tcp")
 	}
 

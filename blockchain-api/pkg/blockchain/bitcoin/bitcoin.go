@@ -61,8 +61,8 @@ func (c *Client) call(method string, params ...string) (interface{}, error) {
 	u = u.ResolveReference(&url.URL{Path: method})
 
 	body := &Body{
-		Id:       1,
-		JsonRpc:  "2.0",
+		ID:       1,
+		JsonRPC:  "2.0",
 		Method:   method,
 		Params:   params,
 		Username: c.config.Username,

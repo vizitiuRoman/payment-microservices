@@ -1,6 +1,8 @@
 package get_invoice
 
 import (
+	"errors"
+
 	"github.com/vizitiuRoman/blockchain-api/pkg/helpers/use_cases"
 	"github.com/vizitiuRoman/blockchain-api/pkg/repositories"
 )
@@ -18,11 +20,13 @@ func NewUseCase(repo repositories.Invoice) use_cases.UseCase[Input, Output] {
 func (uc *UseCase[In, Out]) Execute(input *Input) (*Output, error) {
 	invoice, err := uc.repo.Get(input.ID)
 	if err != nil {
-		return nil, err
+		return nil, errors.New("invoice not found")
 	}
 
 	return &Output{
-		Amount:   invoice,
-		Currency: invoice,
+		ID:       invoice.ID,
+		WalletID: invoice.WalletID,
+		Amount:   invoice.Amount,
+		Currency: invoice.Currency,
 	}, nil
 }

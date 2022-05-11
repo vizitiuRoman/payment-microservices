@@ -2,16 +2,19 @@ package repositories
 
 import (
 	"github.com/jmoiron/sqlx"
-	"github.com/vizitiuRoman/blockchain-api/pkg/repositories/postgres"
+	"github.com/vizitiuRoman/blockchain-api/pkg/repositories/postgres/invoice"
+	"github.com/vizitiuRoman/blockchain-api/pkg/repositories/postgres/wallet"
 )
+
+//go:generate mockery --dir . --name Wallet --name Invoice --output ./mocks
 
 type Wallet interface {
 	Create() (string, error)
 }
 
 type Invoice interface {
-	Create() (string, error)
-	Get(id string) (string, error)
+	Create(*invoice.Invoice) (*invoice.Invoice, error)
+	Get(id string) (*invoice.Invoice, error)
 }
 
 type Repository struct {
@@ -21,7 +24,7 @@ type Repository struct {
 
 func NewRepository(db *sqlx.DB) *Repository {
 	return &Repository{
-		Wallet:  postgres.NewWalletRepository(db),
-		Invoice: postgres.NewInvoiceRepository(db),
+		Wallet:  wallet.NewRepository(db),
+		Invoice: invoice.NewRepository(db),
 	}
 }
