@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
 )
 
 type Config struct {
@@ -17,7 +18,8 @@ type Config struct {
 
 func NewPostgresDB(cfg *Config) (*sqlx.DB, error) {
 	db, err := sqlx.Connect(
-		"postgres", fmt.Sprintf(
+		"postgres",
+		fmt.Sprintf(
 			"host=%s port=%s user=%s dbname=%s sslmode=%s password=%s",
 			cfg.Host, cfg.Port, cfg.Username, cfg.DBName, cfg.SSLMode, cfg.Password,
 		),
@@ -30,5 +32,5 @@ func NewPostgresDB(cfg *Config) (*sqlx.DB, error) {
 		return nil, err
 	}
 
-	return db, nil
+	return &sqlx.DB{}, nil
 }
